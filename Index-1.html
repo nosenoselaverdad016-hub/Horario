@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi horario de clase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--paper:#fbfcff;--grid:#cfdcf0;--ink:#1b2a8a;--soft:#5b6699;--cell:#ffffffcc;--line:#1b2a8a55;--hl:#ffe45c;
+--c-mm:#dbe8ff;--c-sor:#e2f5dc;--c-pro:#ffe6d1;--c-sr:#efe1ff;--c-aw:#ffe0ea;--c-so:#d9f3f3;--c-ipe:#fff3bd;--c-dig:#e6e6e6;--c-sos:#e8f0c8;--c-pi:#ffd9d2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#12162b;--grid:#1f2646;--ink:#c9d3ff;--soft:#8c97cc;--cell:#181d38cc;--line:#c9d3ff44;--hl:#e8c81e;
+--c-mm:#22386b;--c-sor:#25452a;--c-pro:#5a3a22;--c-sr:#442d6b;--c-aw:#5c2a3d;--c-so:#1f4648;--c-ipe:#54491a;--c-dig:#3a3d4a;--c-sos:#414f1f;--c-pi:#5c2f29}}
+:root[data-theme="dark"]{--paper:#12162b;--grid:#1f2646;--ink:#c9d3ff;--soft:#8c97cc;--cell:#181d38cc;--line:#c9d3ff44;--hl:#e8c81e;
+--c-mm:#22386b;--c-sor:#25452a;--c-pro:#5a3a22;--c-sr:#442d6b;--c-aw:#5c2a3d;--c-so:#1f4648;--c-ipe:#54491a;--c-dig:#3a3d4a;--c-sos:#414f1f;--c-pi:#5c2f29}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background-color:var(--paper);color:var(--ink);font-family:"Patrick Hand","Segoe Print","Comic Sans MS",cursive,sans-serif;font-size:18px;line-height:1.25;
+background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+main{max-width:1100px;margin:0 auto;padding:20px 14px 40px}
+h1{font-size:clamp(2rem,6vw,3.2rem);margin:0;font-weight:400;letter-spacing:.01em}
+h1 span{background:linear-gradient(transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%);padding:0 .15em}
+.sub{margin:.4em 0 1em;color:var(--soft)}
+#now{display:inline-block;margin:0 0 14px;padding:6px 12px;border:2px solid var(--ink);border-radius:255px 15px 225px 15px/15px 225px 15px 255px;background:var(--cell)}
+.wrap{overflow-x:auto;max-width:100%;padding-bottom:6px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:720px;background:var(--cell);border:2px solid var(--ink)}
+th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 8px;text-align:center;vertical-align:middle}
+th{font-weight:400;font-size:1.2em;border-bottom:2px solid var(--ink)}
+th.hora,td.hora{text-align:left;white-space:nowrap;width:96px;position:sticky;left:0;background:var(--paper);border-right:2px solid var(--ink);color:var(--soft);font-size:.95em}
+td.hora b{display:block;color:var(--ink);font-weight:400;font-size:1.05em}
+td.s{height:64px}
+.mm{background:var(--c-mm)}.sor{background:var(--c-sor)}.pro{background:var(--c-pro)}.sr{background:var(--c-sr)}.aw{background:var(--c-aw)}
+.so{background:var(--c-so)}.ipe{background:var(--c-ipe)}.dig{background:var(--c-dig)}.sos{background:var(--c-sos)}.pi{background:var(--c-pi)}
+tr.rec td{height:26px;padding:2px 8px;background:transparent;color:var(--soft);font-size:.85em;text-align:center;border-bottom:1px dashed var(--line)}
+th.hoy{background:var(--hl);color:#1b1b1b}
+td.doble{font-size:1.1em}
+td small{display:block;margin-top:4px;font-size:.75em;color:var(--soft);font-weight:400}
+td.ahora{outline:3px solid var(--ink);outline-offset:-3px;font-weight:700}
+.key{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding:0;list-style:none}
+.key li{padding:3px 10px;border:1px solid var(--line);border-radius:999px;font-size:.9em;color:var(--ink)}
+.key li.s{border-color:transparent}
+@media (max-width:600px){body{font-size:16px}td.s{height:58px}}
+td.s,.key li.s{cursor:pointer;transition:transform .15s,box-shadow .15s}
+td.s:hover{transform:scale(1.04);position:relative;z-index:1;box-shadow:0 4px 0 var(--line)}
+.key li.s:hover{transform:translateY(-2px) rotate(-2deg)}
+td.s:focus-visible,.key li:focus-visible{outline:3px dashed var(--ink);outline-offset:-3px}
+td.s.pop{animation:pop .45s}
+@keyframes pop{40%{transform:scale(.92) rotate(-2deg)}70%{transform:scale(1.07) rotate(1deg)}}
+#ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:#0a0f3aa8;backdrop-filter:blur(3px);z-index:9}
+#ov.on{display:flex;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+#card{position:relative;width:min(360px,100%);padding:30px 22px 22px;text-align:center;color:var(--ink);border:3px solid var(--ink);border-radius:255px 15px 225px 15px/15px 225px 15px 255px;box-shadow:8px 8px 0 var(--ink);animation:drop .65s cubic-bezier(.2,1.6,.4,1)}
+@keyframes drop{from{transform:translateY(-140px) rotate(-9deg) scale(.6);opacity:0}}
+.av{position:relative;width:92px;height:92px;margin:0 auto 10px;border:3px solid var(--ink);border-radius:50%;background:var(--paper);display:grid;place-items:center;font-size:2rem;animation:wig 2.4s ease-in-out .7s infinite}
+.av i{position:absolute;right:-14px;bottom:-8px;font-style:normal;font-size:1.7rem;animation:bob 1.2s ease-in-out infinite}
+@keyframes wig{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes bob{50%{transform:translateY(-6px) rotate(12deg)}}
+#card p{margin:0}
+.rol{color:var(--soft)}
+#card h2{margin:2px 0 10px;font-weight:400;font-size:1.25rem}
+.nm{font-size:1.7rem;line-height:1.1;margin-bottom:10px!important;white-space:pre-wrap}
+.nm span{display:inline-block;opacity:0;animation:up .45s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes up{from{transform:translateY(18px) scale(.4) rotate(-15deg)}to{opacity:1;transform:none}}
+.dias{display:inline-block;padding:2px 12px;background:var(--hl);color:#1b1b1b;border-radius:999px;font-size:.95em}
+#x{display:block;margin:16px auto 0;padding:6px 20px;font:inherit;color:var(--paper);background:var(--ink);border:0;border-radius:999px;cursor:pointer}
+.pt{position:absolute;left:50%;top:70px;font-size:1.3rem;opacity:0;pointer-events:none;animation:fly .9s ease-out .25s forwards}
+@keyframes fly{0%{opacity:1;transform:translate(-50%,0) scale(.3)}100%{opacity:0;transform:translate(calc(-50% + var(--x)),var(--y)) rotate(var(--r)) scale(1.2)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}}
+@media print{body{background:#fff}#now{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1><span>Mi horario</span></h1>
+<p class="sub">Lunes a viernes · clases de 8:30 a 14:30 · toca una asignatura y descubre quién la da</p>
+<div id="now" aria-live="polite"></div>
+<div class="wrap">
+<table id="t">
+<thead><tr><th class="hora">Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr></thead>
+<tbody id="b"></tbody>
+</table>
+</div>
+<ul class="key" id="key"></ul>
+</main>
+<div id="ov" role="dialog" aria-modal="true" aria-label="Profesor de la asignatura"><div id="card"></div></div>
+<script>
+var S={mm:"Montaje y Mantenimiento",sor:"Sistemas Operativos en Red",pro:"Programación",sr:"Servicios en Red",aw:"Aplicación Web",so:"Sistema Operativo",ipe:"IPE",ipe2:"IPE II",dig:"Digitalización",sos:"Sostenibilidad",pi:"Proyecto Intermodular"};
+var CL={ipe2:"ipe"};
+var P=[
+ {h:"1",a:"8:30",z:"9:25",d:["mm","sor","mm","dig","aw"]},
+ {h:"2",a:"9:25",z:"10:20",d:["mm","pro","mm","so","sor"]},
+ {r:"Recreo",a:"10:20",z:"10:40"},
+ {h:"3",a:"10:40",z:"11:35",d:["pro","sr","aw","ipe","so"]},
+ {h:"4",a:"11:35",z:"12:30",d:["sor","sr","aw","sr","mm"]},
+ {r:"Recreo",a:"12:30",z:"12:40"},
+ {h:"5",a:"12:40",z:"13:35",d:["ipe2","aw","ipe2","mm","sr"]},
+ {h:"6",a:"13:35",z:"14:30",d:["sr","pi","sos","pro","sr"]}
+];
+function m(t){var x=t.split(":");return +x[0]*60+ +x[1]}
+var b=document.getElementById("b"),html="",skip={};
+P.forEach(function(p,i){
+ if(p.r){html+='<tr class="rec"><td colspan="6">'+p.r+" · "+p.a+" – "+p.z+"</td></tr>";return}
+ html+='<tr data-i="'+i+'"><td class="hora"><b>'+p.h+"ª hora</b>"+p.a+" – "+p.z+"</td>";
+ p.d.forEach(function(k,j){
+  if(skip[i+","+j])return;
+  var n=1;
+  while(P[i+n]&&P[i+n].d&&P[i+n].d[j]===k){skip[(i+n)+","+j]=1;n++}
+  html+='<td class="s '+(CL[k]||k)+(n>1?" doble":"")+'" tabindex="0" data-k="'+k+'" data-d="'+j+'" data-a="'+i+'" data-n="'+n+'"'+(n>1?' rowspan="'+n+'"':"")+">"+S[k]+(n>1?"<small>"+n+" horas · "+p.a+" – "+P[i+n-1].z+"</small>":"")+"</td>"});
+ html+="</tr>"});
+b.innerHTML=html;
+var used={};P.forEach(function(p){if(p.d)p.d.forEach(function(k){used[CL[k]||k]=1})});
+var kh="";Object.keys(used).forEach(function(k){kh+='<li class="s '+k+'" tabindex="0" data-k="'+k+'">'+S[k]+"</li>"});
+document.getElementById("key").innerHTML=kh;
+var TA=["Manchado Moraga, María A.","a"],TO=["Manchado Moraga, Manuel","o"],TM=["Casado Sánchez, Marisol","a"],TS=["González González, Saúl","o"];
+var T={mm:TA,pi:TA,so:TO,sor:TO,sos:TO,ipe:TO,ipe2:TO,pro:TM,aw:TM,dig:TM,sr:TS};
+var E={mm:"🔧",sor:"🖥️",pro:"💻",sr:"🌐",aw:"🕸️",so:"🐧",ipe:"🚀",ipe2:"🚀",dig:"📱",sos:"🌱",pi:"🧩"};
+var DN=["Lunes","Martes","Miércoles","Jueves","Viernes"],ov=document.getElementById("ov"),cd=document.getElementById("card"),last=null;
+function abrir(k){
+ var t=T[k];if(!t)return;
+ var n=t[0].split(", "),days=[];
+ DN.forEach(function(x,j){if(P.some(function(p){return p.d&&p.d[j]===k}))days.push(x)});
+ var h='<div class="av">'+n[1][0]+n[0][0]+"<i>"+E[k]+'</i></div><p class="rol">'+(t[1]=="a"?"Profesora":"Profesor")+" de</p><h2>"+S[k]+'</h2><p class="nm" aria-label="'+n[1]+" "+n[0]+'">';
+ (n[1]+" "+n[0]).split("").forEach(function(c,i){h+='<span style="animation-delay:'+(.3+i*.035)+'s">'+c+"</span>"});
+ h+='</p><p class="dias">Te toca: '+days.join(", ")+'</p><button id="x">Cerrar</button>';
+ for(var i=0;i<12;i++){var a=i/12*6.283+Math.random()*.4,r=90+Math.random()*50;
+  h+='<span class="pt" style="--x:'+Math.round(Math.cos(a)*r)+"px;--y:"+Math.round(Math.sin(a)*r)+"px;--r:"+Math.round(Math.random()*360-180)+'deg">'+E[k]+"</span>"}
+ cd.className=CL[k]||k;cd.innerHTML=h;
+ cd.style.animation="none";void cd.offsetWidth;cd.style.animation="";
+ ov.classList.add("on");document.getElementById("x").focus()}
+function cerrar(){ov.classList.remove("on");if(last)last.focus()}
+document.addEventListener("click",function(e){
+ if(e.target===ov||e.target.id==="x"){cerrar();return}
+ var c=e.target.closest("[data-k]");if(!c)return;
+ last=c;c.classList.remove("pop");void c.offsetWidth;c.classList.add("pop");abrir(c.dataset.k)});
+document.addEventListener("keydown",function(e){
+ if(e.key==="Escape")cerrar();
+ else if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.k){e.preventDefault();e.target.click()}});
+(function(){
+ var n=new Date(),dw=n.getDay(),min=n.getHours()*60+n.getMinutes(),el=document.getElementById("now");
+ if(dw<1||dw>5){el.textContent="Hoy no hay clase. ¡A descansar!";return}
+ var d=dw-1;document.querySelectorAll("thead th")[d+1].className="hoy";
+ var cur=null,next=null;
+ P.forEach(function(p,i){if(!p.d)return;var a=m(p.a),z=m(p.z);
+  if(min>=a&&min<z)cur=i;else if(min<a&&next===null)next=i});
+ if(cur!==null){
+  var p=P[cur],k=p.d[d],end=p.z;
+  document.querySelectorAll('td.s[data-d="'+d+'"]').forEach(function(c){var a=+c.dataset.a;if(cur>=a&&cur<a+ +c.dataset.n){c.classList.add("ahora");end=P[a+ +c.dataset.n-1].z}});
+  el.textContent="Ahora: "+S[k]+" (hasta las "+end+")";
+ }else if(next!==null){
+  var q=P[next];el.textContent="Siguiente: "+S[q.d[d]]+" a las "+q.a;
+ }else if(min<m("8:30")){el.textContent="Primera clase a las 8:30: "+S[P[0].d[d]]}
+ else{el.textContent="Ya terminaron las clases de hoy"}
+})();
+</script>
+</body>
+</html>
